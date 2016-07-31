@@ -9,7 +9,6 @@ import com.myoldbooks.model.Cred;
 import com.myoldbooks.model.Result;
 import com.myoldbooks.model.User;
 import com.myoldbooks.service.security.Hasher;
-import javax.annotation.Resource;
 import javax.ejb.SessionContext;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
@@ -22,7 +21,7 @@ import static com.myoldbooks.utils.Configs.*;
 @Stateless
 public class UserService extends JPAService<User> {
 
-    @Resource
+    @Inject
     SessionContext sessionContext;
     
     @Inject
@@ -33,16 +32,16 @@ public class UserService extends JPAService<User> {
     }
     
     
-    public Result<String> loginUser(String nickname, String pass) {
+    public Result<User> loginUser(String nickname, String pass) {
         
-        Result<String> res = new Result();
+        Result<User> res = new Result();
         
         User u = find("User.findByNickname", "nickname", nickname);
         if(u != null && u.getId() != 0){
             if(hasher.verifyPass(u.getCred(), pass)) {
                 u.setCred(new Cred());
                 sessionContext.getContextData().put(KEY_USER_SESSION, u);
-                res.setRes("Successful login");
+                res.setRes(u);
             } else {
                 res.setErrMsg("Invalid username/password combination!");
             }
@@ -70,12 +69,18 @@ public class UserService extends JPAService<User> {
         return res;
     }
     
-    public Result<String> logoutUser(User user){
+    public Result<String> logoutUser(){
         Result<String> res = new Result();
         sessionContext.getContextData().remove(KEY_USER_SESSION);
         //TODO: check what else should be cleaned up
         res.setRes("Successful logout!");
         return res;
+    }
+    
+    public boolean isLogged(){
+        Object o = sessionContext.getContextData().get(KEY_USER_SESSION);
+        User u = o == null ? null : (User) o;
+        return u != null & u.getId() != 0;
     }
     
 }
