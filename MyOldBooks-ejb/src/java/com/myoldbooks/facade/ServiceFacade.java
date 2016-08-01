@@ -52,6 +52,7 @@ public class ServiceFacade {
     }
 
     @AuthentificationProtected(role = AuthentificationProtected.Role.GUEST)
+    @CSRFProtected(challangeType = CSRFProtected.ChallengeStrategy.NONE)
     public Result<String> registerUser(User user, String pass) {
         return userService.registerUser(user, pass);
     }
