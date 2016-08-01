@@ -13,6 +13,7 @@ import javax.ejb.SessionContext;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
 import static com.myoldbooks.utils.Configs.*;
+import javax.annotation.Resource;
 
 /**
  *
@@ -21,7 +22,7 @@ import static com.myoldbooks.utils.Configs.*;
 @Stateless
 public class UserService extends JPAService<User> {
 
-    @Inject
+    @Resource
     SessionContext sessionContext;
     
     @Inject

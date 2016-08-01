@@ -12,6 +12,7 @@ import javax.ejb.Stateless;
 import javax.inject.Inject;
 
 import static com.myoldbooks.utils.Configs.*;
+import javax.annotation.Resource;
 
 /**
  *
@@ -23,7 +24,7 @@ public class CSRFService {
     @Inject
     private Hasher hasher;
     
-    @Inject 
+    @Resource 
     SessionContext sessionContext;
     
     /**
