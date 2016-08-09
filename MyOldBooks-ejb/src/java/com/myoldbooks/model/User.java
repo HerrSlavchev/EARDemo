@@ -16,6 +16,7 @@ import javax.persistence.Id;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToOne;
+import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
@@ -113,6 +114,7 @@ public class User implements Serializable {
     }
 
     public void setCred(Cred cred) {
+        cred.setUser(this);
         this.cred = cred;
     }
 

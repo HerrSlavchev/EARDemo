@@ -59,7 +59,8 @@ public class JPAService<T> {
         for(int i = 0; i < paramNames.length; i++){
             q.setParameter(paramNames[i], paramValues[i]);
         }
-        return (T) q.getSingleResult();
+        List res = q.getResultList();
+        return res.isEmpty() ? null : (T) res.get(0);
     }
     
     public List<T> findAll(String namedQuery) {

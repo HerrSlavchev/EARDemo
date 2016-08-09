@@ -34,7 +34,7 @@ public class Hasher {
     
     private static final int CMP_STEPS = 512; //how many steps to make when comparing two passwords
 
-    private static final int MIN_SALT_LEN = 64;
+    private static final int MIN_SALT_LEN = 32;
     private static final int OPT_SALT_LEN = 32;
 
     private static final int MIN_ITERATIONS = 256;
@@ -56,15 +56,12 @@ public class Hasher {
         //salt has random length and value
         int saltLen = MIN_SALT_LEN + RANDOM.nextInt(OPT_SALT_LEN);
         String salt = generateRandomString(saltLen);
-
         //random number of iterations
         int iter = MIN_ITERATIONS + RANDOM.nextInt(OPT_ITERATIONS);
-
         //random keyLength
         int passLen = MIN_PASS_LEN + RANDOM.nextInt(OPT_PASS_LEN);
-
-        byte[] key = hashPassword(pass, salt, iter, passLen);
-        String hashedPass = encoder.bytesToString(key);
+        
+        String hashedPass = hashPassword(pass, salt, iter, passLen);
 
         res = new Cred();
         res.setSalt(salt);
@@ -89,13 +86,14 @@ public class Hasher {
             return false;
         }
 
-        byte[] realPassBytes = hashPassword(pass, cred.getSalt(), cred.getIter(), cred.getLen());
-        byte[] passBytes = encoder.stringToBytes(pass);
+        System.out.println("pass 1");
+        char[] realPassChars = cred.getPass().toCharArray();
+        char[] passChars = hashPassword(pass, cred.getSalt(), cred.getIter(), cred.getLen()).toCharArray();
 
-        int realSteps = realPassBytes.length < passBytes.length ? realPassBytes.length : passBytes.length;
+        int realSteps = realPassChars.length < passChars.length ? realPassChars.length : passChars.length;
         boolean match = true;
         for (int i = 0; i < realSteps; i++) {
-            if (realPassBytes[i] != passBytes[i]) {
+            if (realPassChars[i] != passChars[i]) {
                 match = false;
             }
         }
@@ -108,18 +106,17 @@ public class Hasher {
         return match;
     }
 
-    private byte[] hashPassword(String pass, String salt, int iterations, int keyLength) {
-
+    private String hashPassword(String pass, String salt, int iterations, int keyLength) {
+        String res = "";
         try {
             SecretKeyFactory skf = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA512");
             PBEKeySpec spec = new PBEKeySpec(pass.toCharArray(), encoder.stringToBytes(salt), iterations, keyLength);
             SecretKey key = skf.generateSecret(spec);
-            byte[] res = key.getEncoded();
-            return res;
-
+            res = encoder.bytesToString(key.getEncoded());
         } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
             throw new RuntimeException(e);
         }
+        return res;
     }
 
     public byte[] generateRandomBytes(int len) {

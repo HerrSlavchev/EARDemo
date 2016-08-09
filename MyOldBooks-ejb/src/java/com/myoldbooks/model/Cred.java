@@ -9,8 +9,10 @@ import java.io.Serializable;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.MapsId;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
@@ -46,7 +48,8 @@ public class Cred implements Serializable {
     @Column(name = "len")
     private int len;
     
-    @JoinColumn(name = "id_user", referencedColumnName = "id", insertable = false, updatable = false)
+    @MapsId
+    @JoinColumn(name = "id_user", referencedColumnName = "id")
     @OneToOne(optional = false)
     private User user;
 
