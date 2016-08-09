@@ -40,7 +40,6 @@ public class UserService extends JPAService<User> {
         User u = find("User.findByNickname", "nickname", nickname);
         if(u != null && u.getId() != 0){
             if(hasher.verifyPass(u.getCred(), pass)) {
-                u.setCred(new Cred());
                 sessionContext.getContextData().put(KEY_USER_SESSION, u);
                 res.setRes(u);
             } else {

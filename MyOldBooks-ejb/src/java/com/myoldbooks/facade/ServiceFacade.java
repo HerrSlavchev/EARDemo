@@ -37,6 +37,7 @@ public class ServiceFacade {
         Result<String> res = new Result<>();
         
         User u = userService.loginUser(nickname, password).getRes();
+        
         if (u != null && u.getId() != 0) {
             String token = csrfService.refreshToken();
             res.setRes(token);

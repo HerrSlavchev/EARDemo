@@ -5,7 +5,6 @@
  */
 package com.myoldbooks.utils;
 
-import java.util.Base64;
 import javax.ejb.Stateless;
 import javax.enterprise.inject.Alternative;
 
@@ -15,26 +14,33 @@ import javax.enterprise.inject.Alternative;
  */
 @Stateless
 @Alternative
-public class ByteStringEncoderBase64 implements ByteStringEncoderIF {
+public class ByteStringEncoderUTF32 implements ByteStringEncoderIF{
 
     @Override
     public int evalByteCount(int charCount) {
-        int len = (int) (3 * (charCount / 4));
-        int rem = len % 3;
-        if (rem != 0) { //add padding to make it multiple of 4
-            len += (3 - rem);
-        }
-
-        return len;
+        return charCount*4;
     }
 
     @Override
     public byte[] stringToBytes(String str) {
-        return Base64.getDecoder().decode(str);
+        byte[] bytes = null;
+        try {
+            bytes = str.getBytes("UTF-32BE");
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        return bytes;
     }
 
     @Override
     public String bytesToString(byte[] bytes) {
-        return Base64.getEncoder().encodeToString(bytes);
+        String res = null;
+        try {
+            res = new String(bytes, "UTF-32BE");
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        return res;
     }
+    
 }
