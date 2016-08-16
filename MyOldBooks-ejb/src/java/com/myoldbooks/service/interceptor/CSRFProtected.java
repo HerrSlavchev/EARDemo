@@ -27,6 +27,6 @@ public @interface CSRFProtected {
         REQUIRED, NONE, ANY
     }
     
-    ChallengeStrategy challangeType() default ChallengeStrategy.REQUIRED; 
+    ChallengeStrategy challengeType() default ChallengeStrategy.REQUIRED; 
     
 }

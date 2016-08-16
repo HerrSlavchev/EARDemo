@@ -86,7 +86,6 @@ public class Hasher {
             return false;
         }
 
-        System.out.println("pass 1");
         char[] realPassChars = cred.getPass().toCharArray();
         char[] passChars = hashPassword(pass, cred.getSalt(), cred.getIter(), cred.getLen()).toCharArray();
 

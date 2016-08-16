@@ -12,8 +12,10 @@ import com.myoldbooks.service.UserService;
 import com.myoldbooks.service.interceptor.AuthentificationProtected;
 import com.myoldbooks.service.interceptor.CSRFProtected;
 import com.myoldbooks.service.interceptor.CSRFToken;
+import com.myoldbooks.service.interceptor.FacadeInterceptor;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
+import javax.interceptor.Interceptors;
 
 /**
  * Default: methods will require the user to be logged in and provide a CSRF token (mark with @CSRFToken).
@@ -22,6 +24,7 @@ import javax.inject.Inject;
 @Stateless
 @CSRFProtected
 @AuthentificationProtected
+@Interceptors(FacadeInterceptor.class)
 public class ServiceFacade {
 
     @Inject
@@ -30,7 +33,7 @@ public class ServiceFacade {
     @Inject
     CSRFService csrfService;
 
-    @CSRFProtected(challangeType = CSRFProtected.ChallengeStrategy.NONE)
+    @CSRFProtected(challengeType = CSRFProtected.ChallengeStrategy.NONE)
     @AuthentificationProtected(role = AuthentificationProtected.Role.GUEST)
     public Result<String> login(String nickname, String password) {
         
@@ -48,15 +51,17 @@ public class ServiceFacade {
         return res;
     }
     
+    @AuthentificationProtected(role = AuthentificationProtected.Role.USER)
+    @CSRFProtected(challengeType = CSRFProtected.ChallengeStrategy.REQUIRED)
     public Result<String> logout(@CSRFToken String token) {
+        csrfService.clearToken();
         return userService.logoutUser();
     }
 
     @AuthentificationProtected(role = AuthentificationProtected.Role.GUEST)
-    @CSRFProtected(challangeType = CSRFProtected.ChallengeStrategy.NONE)
+    @CSRFProtected(challengeType = CSRFProtected.ChallengeStrategy.NONE)
     public Result<String> registerUser(User user, String pass) {
         return userService.registerUser(user, pass);
     }
-    
     
 }

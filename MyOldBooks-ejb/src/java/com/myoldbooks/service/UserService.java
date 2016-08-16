@@ -13,17 +13,20 @@ import javax.ejb.SessionContext;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
 import static com.myoldbooks.utils.Configs.*;
+import java.io.Serializable;
 import javax.annotation.Resource;
+import javax.enterprise.context.SessionScoped;
 
 /**
  *
  * @author SRVR1
  */
-@Stateless
-public class UserService extends JPAService<User> {
-
-    @Resource
-    SessionContext sessionContext;
+@SessionScoped
+public class UserService extends JPAService<User> implements Serializable{
+    
+    private static final long serialVersionUID = 1L;
+    
+    private User user = null;
     
     @Inject
     private Hasher hasher;
@@ -40,7 +43,7 @@ public class UserService extends JPAService<User> {
         User u = find("User.findByNickname", "nickname", nickname);
         if(u != null && u.getId() != 0){
             if(hasher.verifyPass(u.getCred(), pass)) {
-                sessionContext.getContextData().put(KEY_USER_SESSION, u);
+                user = u;
                 res.setRes(u);
             } else {
                 res.setErrMsg("Invalid username/password combination!");
@@ -71,16 +74,14 @@ public class UserService extends JPAService<User> {
     
     public Result<String> logoutUser(){
         Result<String> res = new Result();
-        sessionContext.getContextData().remove(KEY_USER_SESSION);
+        user = null;
         //TODO: check what else should be cleaned up
         res.setRes("Successful logout!");
         return res;
     }
     
     public boolean isLogged(){
-        Object o = sessionContext.getContextData().get(KEY_USER_SESSION);
-        User u = o == null ? null : (User) o;
-        return u != null & u.getId() != 0;
+        return user != null && user.getId() != 0;
     }
     
 }

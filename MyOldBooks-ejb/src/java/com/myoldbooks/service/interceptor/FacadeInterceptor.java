@@ -5,6 +5,7 @@
  */
 package com.myoldbooks.service.interceptor;
 
+import com.myoldbooks.model.Result;
 import com.myoldbooks.service.CSRFService;
 import com.myoldbooks.service.UserService;
 import java.lang.annotation.Annotation;
@@ -30,7 +31,11 @@ public class FacadeInterceptor {
         Object res = null;
         if (checkCSRF(context) && checkSession(context)) {
             res = context.proceed();
+        } else {
+            res = new Result<>();
+            ((Result) res).setErrMsg("Invalid authentication!");
         }
+
         return res;
     }
 
@@ -38,21 +43,23 @@ public class FacadeInterceptor {
         CSRFProtected.ChallengeStrategy csrfStrategy = CSRFProtected.ChallengeStrategy.ANY;
         CSRFProtected csrfAnno = getAnnotationByType(context, CSRFProtected.class);
         if (csrfAnno != null) {
-            csrfStrategy = csrfAnno.challangeType();
+            csrfStrategy = csrfAnno.challengeType();
         }
 
         if (csrfStrategy == CSRFProtected.ChallengeStrategy.REQUIRED) {
             Parameter[] params = context.getMethod().getParameters();
-            for (Parameter par : params) {
+            Object[] paramValues = context.getParameters();
+            for (int i = 0; i < params.length; i++) {
+                Parameter par = params[i];
                 if (par.getAnnotation(CSRFToken.class) != null) {
-                    String token = String.valueOf(par);
+                    String token = (String) paramValues[i];
                     if (!csrfService.checkToken(token)) {
-                        throw new RuntimeException("Incorrect CSRF Token!");
+                        return false;
                     }
+                    break;
                 }
             }
         }
-
         return true;
     }
 
@@ -64,19 +71,19 @@ public class FacadeInterceptor {
         }
 
         if ((role == AuthentificationProtected.Role.USER && !userService.isLogged())) {
-            throw new RuntimeException("User must log in!");
+            return false;
         } else if (role == AuthentificationProtected.Role.GUEST && userService.isLogged()) {
-            throw new RuntimeException("User must log out!");
+            return false;
         }
-
         return true;
     }
 
     private <T extends Annotation> T getAnnotationByType(InvocationContext context, Class<T> annoClass) {
         T[] annos = context.getMethod().getDeclaredAnnotationsByType(annoClass);
         if (annos.length == 0) {
-            annos = context.getMethod().getAnnotationsByType(annoClass);
+            annos = context.getClass().getAnnotationsByType(annoClass);
         }
+
         return annos.length != 0 ? annos[0] : null;
     }
 
