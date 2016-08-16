@@ -12,6 +12,7 @@ import javax.ejb.Stateless;
 import javax.inject.Inject;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.FormParam;
+import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -55,5 +56,17 @@ public class RestFacade {
     @Path("/logout")
     public Result<String> logout(@HeaderParam("csrf") String csrfToken){
         return serviceFacade.logout(csrfToken);
+    }
+    
+    @GET
+    @Path("/demo/unprotected")
+    public Result<String> unrpotectedMethod(){
+        return serviceFacade.unprotectedMethod();
+    }
+    
+    @POST
+    @Path("/demo/protected")
+    public Result<String> protectedMethod(@HeaderParam("csrf") String csrfToken){
+        return serviceFacade.protectedMethod(csrfToken);
     }
 }

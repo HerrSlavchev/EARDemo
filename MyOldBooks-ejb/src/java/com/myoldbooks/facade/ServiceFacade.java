@@ -64,4 +64,19 @@ public class ServiceFacade {
         return userService.registerUser(user, pass);
     }
     
+    @CSRFProtected(challengeType = CSRFProtected.ChallengeStrategy.NONE)
+    @AuthentificationProtected(role = AuthentificationProtected.Role.ANY)
+    public Result<String> unprotectedMethod(){
+        Result<String> res = new Result<>();
+        res.setRes("Unprotected method: Successful invocation!");
+        return res;
+    }
+    
+    @CSRFProtected(challengeType = CSRFProtected.ChallengeStrategy.REQUIRED)
+    @AuthentificationProtected(role = AuthentificationProtected.Role.USER)
+    public Result<String> protectedMethod(@CSRFToken String token){
+        Result<String> res = new Result<>();
+        res.setRes("Protected method: Successful invocation!");
+        return res;
+    }
 }

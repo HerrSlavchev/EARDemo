@@ -14,6 +14,7 @@ and open the template in the editor.
         <script src="js/user/login.js"></script>
         <script src="js/user/registration.js"></script>
         <script src="js/user/logout.js"></script>
+        <script src="js/user/demo.js"></script>
         <link rel="stylesheet" type="text/css" href="css/form.css">
     </head>
     <body>
@@ -59,9 +60,22 @@ and open the template in the editor.
             </form>
         </div>
         <br>
-        
+
         <div ng-controller="LogoutCtrl as logout">
             <button ng-click="logout.logout()">Logout</button>
+        </div>
+        <br>
+
+        <div ng-controller="DemoCtrl as demo">
+            <p>
+                <button ng-click="demo.unprotectedCall()">Call unprotected method</button>
+            </p>
+            <p>
+                <button ng-click="demo.protectedCall()">Call protected method</button>
+            </p>
+            <p>
+                <button ng-click="demo.fakeCSRF()">Call protected method with incorrect CSRF token</button>
+            </p>
         </div>
         <br>
 
